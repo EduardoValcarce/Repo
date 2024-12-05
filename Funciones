@@ -1,0 +1,131 @@
+import random
+
+def pedir_numero_rango(mensaje:str,mensaje_error:str,minimo:int,maximo:int) -> int:
+    numero = int(input(mensaje))
+    while numero > maximo or numero < minimo:
+        numero = int(input(mensaje_error))
+    return numero
+
+def pedir_numero_minimo(mensaje:str,mensaje_error:str,minimo:int) -> int:
+    numero = int(input(mensaje))
+    while numero < minimo:
+        numero = int(input(mensaje_error))
+    return numero
+
+def inicializar_matriz(cantidad_filas:int,cantidad_columnas:int,valor_inicial:any = None) -> list:
+    matriz = []
+
+    for i in range(cantidad_filas):
+        fila = [valor_inicial] * cantidad_columnas
+        matriz += [fila]
+    return matriz
+
+def hardcodear_datos(matriz_votos:list) -> None:
+    for fil in range(len(matriz_votos)):
+        matriz_votos[fil][0] = fil + 1
+        matriz_votos[fil][1] = random.randint(1,100)
+        matriz_votos[fil][2] = random.randint(1,100)
+        matriz_votos[fil][3] = random.randint(1,100)
+    print("DATOS HARDCODEADOS CON EXITO")
+
+def cargar_votos(matriz_votos:list) -> None:
+    for fil in range(len(matriz_votos)):
+        matriz_votos[fil][0] = fil + 1
+        matriz_votos[fil][1] = pedir_numero_rango("Ingrese el voto: ","Error, numero invalido(1 al 100), vuelva a cargar: ",1,100)
+        matriz_votos[fil][2] = pedir_numero_rango("Ingrese el voto: ","Error, numero invalido(1 al 100), vuelva a cargar: ",1,100)
+        matriz_votos[fil][3] = pedir_numero_rango("Ingrese el voto: ","Error, numero invalido(1 al 100), vuelva a cargar: ",1,100)
+        print("CARGO LOS VOTOS")
+    print("CARGADOS CON EXITO LOS VOTOS")
+
+def mostrar_resultado(matriz_votos:list) -> None:
+    for fil in range(len(matriz_votos)):
+        print(f"Participante Numero: {matriz_votos[fil][0]}")
+        print(f"Votos Jurado 1: {matriz_votos[fil][1]}")
+        print(f"Votos Jurado 2: {matriz_votos[fil][2]}")
+        print(f"Votos Jurado 3: {matriz_votos[fil][3]}")
+        print(f"Su nota promedio es: {calcular_promedio_fila(matriz_votos,fil)}\n")
+
+def calcular_promedio_fila(matriz_votos:list,fila:int) -> int:
+    promedio = int((matriz_votos[fila][1] + matriz_votos[fila][2] + matriz_votos[fila][3]) / 3)
+    return promedio
+
+def ordenar_por_promedio(matriz_votos: list, orden:str) -> None:
+    for i in range(len(matriz_votos) - 1):
+        for j in range(i + 1, len(matriz_votos)):
+            promedio_i = calcular_promedio_fila(matriz_votos, i)
+            promedio_j = calcular_promedio_fila(matriz_votos, j)
+            if (orden == "ASC" and promedio_i > promedio_j) or (orden == "DESC" and promedio_i < promedio_j):
+                matriz_votos[i], matriz_votos[j] = matriz_votos[j], matriz_votos[i]
+    print(f"Matriz ordenada en orden {orden}.")
+
+def mostrar_peores_3(matriz_votos: list) -> None:
+    ordenar_por_promedio(matriz_votos, "ASC")
+    for i in range(3):
+        print(f"Participante Número: {matriz_votos[i][0]}")
+        print(f"Promedio: {calcular_promedio_fila(matriz_votos, i)}\n")
+
+def calcular_mayores_al_promedio_general(matriz_votos: list) -> None:
+    suma_total = 0
+    for i in range(len(matriz_votos)):
+        suma_total += calcular_promedio_fila(matriz_votos, i)
+    promedio_total = suma_total / len(matriz_votos)
+    for i in range(len(matriz_votos)):
+        if calcular_promedio_fila(matriz_votos, i) > promedio_total:
+            print(f"El Participante {matriz_votos[i][0]},super el promedio general de {promedio_total} con {calcular_promedio_fila(matriz_votos, i)}")
+
+def sumar_por_columna(matriz_votos:list,columna:int)-> int:
+    suma_total = 0
+    for fil in range(len(matriz_votos)):
+        suma_total += matriz_votos[fil][columna]
+    return suma_total
+
+def crear_lista_jurado(matriz_votos:list)-> list:
+    notas_jurado_1 = sumar_por_columna(matriz_votos,1)
+    notas_jurado_2 = sumar_por_columna(matriz_votos,2)
+    notas_jurado_3 = sumar_por_columna(matriz_votos,3)
+
+    lista_notas = [notas_jurado_1,notas_jurado_2,notas_jurado_3]
+
+    return lista_notas
+
+def calcular_valor_minimo(lista:list)->int:
+    minimo = None
+    bandera = False
+    for i in range(len(lista)):
+        if bandera == False or lista[i] < minimo:
+            minimo = lista[i]
+            bandera = True
+    return minimo
+
+def obtener_valor_notas(numero:int)-> str:
+    if numero == 0:
+        retorno = "Jurado 1"
+    elif numero == 1:
+        retorno = "Jurado 2"
+    elif numero == 2:
+        retorno = "Jurado 3"
+
+    return retorno
+
+def buscar_notas_mas_bajas(matriz_votos:list)-> str:
+    lista_notas = crear_lista_jurado(matriz_votos)
+    maximo = calcular_valor_minimo(lista_notas)
+    jurados_malos = ""
+
+    for i in range(len(lista_notas)):
+        if lista_notas[i] == maximo:
+            notas_str = obtener_valor_notas(i)
+            jurados_malos += notas_str + "\n"
+    return jurados_malos
+
+def mostrar_participantes_por_sumatoria(matriz_votos: list) -> None:
+    suma_objetivo = pedir_numero_rango("Ingrese un numero entre 3 y 300: ","Error, ingrese un numero entre (3-300): ",3,300)
+    bandera_participantes = False
+    for i in range(len(matriz_votos)):
+        suma_notas = matriz_votos[i][1] + matriz_votos[i][2] + matriz_votos[i][3]
+        if suma_notas == suma_objetivo:
+            bandera_participantes = True
+            print(f"Participante Número: {matriz_votos[i][0]}, Notas: {matriz_votos[i][1]}, {matriz_votos[i][2]}, {matriz_votos[i][3]}, Suma: {suma_notas}")
+
+    if bandera_participantes == False:
+        print(f"No hay participantes con una suma de notas igual a {suma_objetivo}.")
