@@ -1,0 +1,31 @@
+from Funciones import *
+
+def ejecutar_menu():
+    matriz_votos = inicializar_matriz(5,4,0)
+
+    while(True):
+        print("Opcion 1 Cargar Votos:\nOpcion 2 Mostrar Votos:\nOpcion 3 Ordenar votos por nota promedio:\n"
+              "Opcion 4  Peores 3:\nOpcion 5 Mayores promedio:\nOpcion 6  Jurado malo:\nOpcion 7 Sumatoria:\nOpcion 8 Definir ganador:")
+        opcion = pedir_numero_rango("Su opcion: \n","Opcion invalida(Debe ser del 1 al 8, vuelva a ingresar: ",1,8)
+        if opcion == 1:
+            hardcodear_datos(matriz_votos)
+            # cargar_votos(matriz_votos)
+        elif opcion == 2:
+            mostrar_resultado(matriz_votos)
+        elif opcion == 3:
+            orden = (input("Ingrese un orden: ASC (ascendente) o DESC (descendente): "))
+            ordenar_por_promedio(matriz_votos,orden)
+            print(matriz_votos)
+        elif opcion == 4:
+            mostrar_peores_3(matriz_votos)
+        elif opcion == 5:
+            calcular_mayores_al_promedio_general(matriz_votos)
+        elif opcion == 6:
+            notas_mas_bajas = buscar_notas_mas_bajas(matriz_votos)
+            print("El o los jueces que dieron las notas mas bajas son: ")
+            print(notas_mas_bajas)
+        elif opcion == 7:
+            mostrar_participantes_por_sumatoria(matriz_votos)
+        elif opcion == 8:
+            pass
+ejecutar_menu()
